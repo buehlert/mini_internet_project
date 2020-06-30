@@ -46,7 +46,7 @@ for ((k=0;k<group_numbers;k++)); do
             -v /etc/timezone:/etc/timezone:ro \
             -v /etc/localtime:/etc/localtime:ro \
             -v "${DIRECTORY}"/config/welcoming_message.txt:/etc/motd \
-            thomahol/d_ssh
+            buehlert/d_ssh
 
     	# start switches
     	for ((l=0;l<n_l2_switches;l++)); do
@@ -65,7 +65,7 @@ for ((k=0;k<group_numbers;k++)); do
                 --sysctl net.ipv4.conf.default.rp_filter=0 \
                 --sysctl net.ipv4.conf.lo.rp_filter=0 \
                 -v /etc/timezone:/etc/timezone:ro \
-                -v /etc/localtime:/etc/localtime:ro thomahol/d_switch
+                -v /etc/localtime:/etc/localtime:ro buehlert/d_switch
         done
 
         # start hosts in l2 network
@@ -81,7 +81,7 @@ for ((k=0;k<group_numbers;k++)); do
                     --name="${group_number}""_L2_""${l2name}""_""${hname}" \
                     --sysctl net.ipv4.icmp_ratelimit=0 \
                     -v /etc/timezone:/etc/timezone:ro \
-                    -v /etc/localtime:/etc/localtime:ro thomahol/d_host
+                    -v /etc/localtime:/etc/localtime:ro buehlert/d_host
             fi
         done
 
@@ -108,7 +108,7 @@ for ((k=0;k<group_numbers;k++)); do
                 -v "${location}"/daemons:/etc/frr/daemons \
                 -v "${location}"/frr.conf:/etc/frr/frr.conf \
                 -v /etc/timezone:/etc/timezone:ro \
-                -v /etc/localtime:/etc/localtime:ro thomahol/d_router
+                -v /etc/localtime:/etc/localtime:ro buehlert/d_router
 
             # start host
             if [ "${property2}" == "host" ];then
@@ -117,7 +117,7 @@ for ((k=0;k<group_numbers;k++)); do
                     --cpus=2 --pids-limit 100 --hostname "${rname}""_host" \
                     --sysctl net.ipv4.icmp_ratelimit=0 \
                     -v /etc/timezone:/etc/timezone:ro \
-                    -v /etc/localtime:/etc/localtime:ro thomahol/d_host \
+                    -v /etc/localtime:/etc/localtime:ro buehlert/d_host \
                     # add this for bgpsimple -v ${DIRECTORY}/docker_images/host/bgpsimple.pl:/home/bgpsimple.pl \
 
             fi
@@ -138,7 +138,7 @@ for ((k=0;k<group_numbers;k++)); do
             --sysctl net.ipv4.conf.lo.rp_filter=0 \
             -v /etc/timezone:/etc/timezone:ro \
             -v /etc/localtime:/etc/localtime:ro \
-            thomahol/d_ixp
+            buehlert/d_ixp
 
     fi
 

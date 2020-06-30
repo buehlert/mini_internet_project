@@ -126,8 +126,8 @@ for ((j=0;j<n_groups;j++)); do
             property2="${router_i[2]}"
 
             if [ "${property2}" == "host" ];then
-                subnet1="$(subnet_host_router "${group_number}" "$i" "host")"
-                subnet2="$(subnet_host_router "${group_number}" "$i" "router")"
+                subnet1="$(subnet_host_router_hijack "${group_number}" "$i" "host")"
+                subnet2="$(subnet_host_router_hijack "${group_number}" "$i" "router")"
 
                 first_sub1="${subnet1#*.}"
                 first_sub2="${subnet2#*.}"

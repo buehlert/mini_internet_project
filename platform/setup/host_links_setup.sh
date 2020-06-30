@@ -28,10 +28,10 @@ for ((k=0;k<group_numbers;k++)); do
         readarray routers < "${DIRECTORY}"/config/$group_router_config
         n_routers=${#routers[@]}
 
-        br_name="${group_number}"-host
+        # br_name="${group_number}"-host
 
-        echo -n "-- add-br "${br_name}" " >> "${DIRECTORY}"/groups/add_bridges.sh
-        echo "ifconfig "${br_name}" 0.0.0.0 up" >> "${DIRECTORY}"/groups/ip_setup.sh
+        # echo -n "-- add-br "${br_name}" " >> "${DIRECTORY}"/groups/add_bridges.sh
+        # echo "ifconfig "${br_name}" 0.0.0.0 up" >> "${DIRECTORY}"/groups/ip_setup.sh
 
         for ((i=0;i<n_routers;i++)); do
             router_i=(${routers[$i]})
@@ -41,19 +41,22 @@ for ((k=0;k<group_numbers;k++)); do
 
             if [ "${property2}" == "host" ];then
 
-                subnet_bridge="$(subnet_host_router "${group_number}" "${i}" "bridge")"
-                subnet_router="$(subnet_host_router "${group_number}" "${i}" "router")"
-                subnet_host="$(subnet_host_router "${group_number}" "${i}" "host")"
+                subnet_bridge="$(subnet_host_router_hijack "${group_number}" "${i}" "bridge")"
+                subnet_router="$(subnet_host_router_hijack "${group_number}" "${i}" "router")"
+                subnet_host="$(subnet_host_router_hijack "${group_number}" "${i}" "host")"
 
-                ./setup/ovs-docker.sh add-port ${br_name} "host"  \
-                "${group_number}"_"${rname}"router
+                ./setup/ovs-docker.sh add-link "host" "${group_number}"_"${rname}"router \
+                    "${rname}""router" "${group_number}"_"${rname}"host
 
-                ./setup/ovs-docker.sh add-port ${br_name} "${rname}""router" \
-                "${group_number}"_"${rname}"host
+                # ./setup/ovs-docker.sh add-port ${br_name} "host"  \
+                # "${group_number}"_"${rname}"router
 
-                ./setup/ovs-docker.sh connect-ports "${br_name}" \
-                "host" "${group_number}"_"${rname}"router \
-                "${rname}""router" "${group_number}"_"${rname}"host
+                # ./setup/ovs-docker.sh add-port ${br_name} "${rname}""router" \
+                # "${group_number}"_"${rname}"host
+
+                # ./setup/ovs-docker.sh connect-ports "${br_name}" \
+                # "host" "${group_number}"_"${rname}"router \
+                # "${rname}""router" "${group_number}"_"${rname}"host
 
                 # set default ip address and default gw in host
                 if [ "$group_config" == "Config" ]; then

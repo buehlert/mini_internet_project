@@ -1,1 +1,4 @@
 .DS_Store
+groups/
+platform/log.txt
+platform/openvpn-status.log

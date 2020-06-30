@@ -70,6 +70,10 @@ for ((k=0;k<group_numbers;k++)); do
         echo "ifconfig "${group_number}"-ssh 0.0.0.0 up" >> "${DIRECTORY}"/groups/ip_setup.sh
 
         # Connect the proxy container to the virtual devices
+        #./setup/ovs-docker.sh add-link ssh "${group_number}"_ssh ssh_in "${group_number}"_ssh
+        #./setup/ovs-docker.sh mod-interface-properties ssh "${group_number}"_ssh --ipaddress="${subnet_ssh_to_cont}"
+        #./setup/ovs-docker.sh mod-interface-properties ssh_in "${group_number}"_ssh --ipaddress="${subnet_ssh_to_group}"
+
         ./setup/ovs-docker.sh add-port "${group_number}"-ssh ssh "${group_number}"_ssh --ipaddress="${subnet_ssh_to_cont}"
         # Connect the proxy container to the main host
         ./setup/ovs-docker.sh add-port ssh_to_group ssh_in "${group_number}"_ssh --ipaddress="${subnet_ssh_to_group}"
@@ -91,6 +95,9 @@ for ((k=0;k<group_numbers;k++)); do
             if [ "${property2}" == "host" ];then
                 #ssh login for host
                 subnet_host="$(subnet_sshContainer_groupContainer "${group_number}" "${i}" -1 "host")"
+                #./setup/ovs-docker.sh add-link ssh "${group_number}"_"${rname}"router ssh "${group_number}"_"${rname}"host
+                #./setup/ovs-docker.sh mod-interface-properties ssh "${group_number}"_"${rname}"router --ipaddress="${subnet_router}"
+                #./setup/ovs-docker.sh mod-interface-properties ssh "${group_number}"_"${rname}"host --ipaddress="${subnet_host}"
                 ./setup/ovs-docker.sh add-port "${group_number}"-ssh ssh "${group_number}"_"${rname}"host --ipaddress="${subnet_host}"
                 docker cp "${DIRECTORY}"/groups/g"${group_number}"/id_rsa.pub "${group_number}"_"${rname}"host:/root/.ssh/authorized_keys
 

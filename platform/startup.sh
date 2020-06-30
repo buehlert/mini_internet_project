@@ -33,19 +33,19 @@ time ./setup/folder_setup.sh "${DIRECTORY}"
 echo ""
 echo ""
 
-echo "dns_config.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
-echo "dns_config.sh: "
-time ./setup/dns_config.sh "${DIRECTORY}"
-
-echo ""
-echo ""
-
-echo "vpn_config.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
-echo "vpn_config.sh: "
-time ./setup/vpn_config.sh "${DIRECTORY}"
-
-echo ""
-echo ""
+# echo "dns_config.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
+# echo "dns_config.sh: "
+# time ./setup/dns_config.sh "${DIRECTORY}"
+# 
+# echo ""
+# echo ""
+# 
+# echo "vpn_config.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
+# echo "vpn_config.sh: "
+# time ./setup/vpn_config.sh "${DIRECTORY}"
+# 
+# echo ""
+# echo ""
 
 echo "goto_scripts.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
 echo "goto_scripts.sh: "
@@ -76,13 +76,13 @@ time ./setup/host_links_setup.sh "${DIRECTORY}"
 echo ""
 echo ""
 
-echo "echo \"layer2 links\"" >> "${DIRECTORY}"/groups/ip_setup.sh
-echo "layer2_setup.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
-echo "layer2_setup.sh: "
-time ./setup/layer2_setup.sh "${DIRECTORY}"
-
-echo ""
-echo ""
+# echo "echo \"layer2 links\"" >> "${DIRECTORY}"/groups/ip_setup.sh
+# echo "layer2_setup.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
+# echo "layer2_setup.sh: "
+# time ./setup/layer2_setup.sh "${DIRECTORY}"
+# 
+# echo ""
+# echo ""
 
 echo "echo \"internal links\"" >> "${DIRECTORY}"/groups/ip_setup.sh
 echo "internal_links_setup.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
@@ -100,27 +100,27 @@ time ./setup/external_links_setup.sh "${DIRECTORY}"
 echo ""
 echo ""
 
-echo "echo \"measurement links\"" >> "${DIRECTORY}"/groups/ip_setup.sh
-echo "measurement_setup.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
-echo "measurement_setup.sh: "
-time ./setup/measurement_setup.sh "${DIRECTORY}"
+# echo "echo \"measurement links\"" >> "${DIRECTORY}"/groups/ip_setup.sh
+# echo "measurement_setup.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
+# echo "measurement_setup.sh: "
+# time ./setup/measurement_setup.sh "${DIRECTORY}"
+# 
+# echo ""
+# echo ""
+
+# echo "echo \"ssh links\"" >> "${DIRECTORY}"/groups/ip_setup.sh
+# echo "ssh_setup.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
+# echo "ssh_setup.sh: "
+# time ./setup/ssh_setup.sh "${DIRECTORY}"
 
 echo ""
 echo ""
 
-echo "echo \"ssh links\"" >> "${DIRECTORY}"/groups/ip_setup.sh
-echo "ssh_setup.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
-echo "ssh_setup.sh: "
-time ./setup/ssh_setup.sh "${DIRECTORY}"
-
-echo ""
-echo ""
-
-echo "echo \"matrix_setup\"" >> "${DIRECTORY}"/groups/ip_setup.sh
-echo "matrix_setup.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
-echo "matrix_setup.sh: "
-time ./setup/matrix_setup.sh "${DIRECTORY}"
-
+# echo "echo \"matrix_setup\"" >> "${DIRECTORY}"/groups/ip_setup.sh
+# echo "matrix_setup.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
+# echo "matrix_setup.sh: "
+# time ./setup/matrix_setup.sh "${DIRECTORY}"
+# 
 # echo ""
 # echo ""
 #
@@ -131,13 +131,13 @@ time ./setup/matrix_setup.sh "${DIRECTORY}"
 echo ""
 echo ""
 
-echo "echo \"dns links\"" >> "${DIRECTORY}"/groups/ip_setup.sh
-echo "dns_setup.sh: "
-echo "dns_setup.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
-time ./setup/dns_setup.sh "${DIRECTORY}"
-
-echo ""
-echo ""
+# echo "echo \"dns links\"" >> "${DIRECTORY}"/groups/ip_setup.sh
+# echo "dns_setup.sh: "
+# echo "dns_setup.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
+# time ./setup/dns_setup.sh "${DIRECTORY}"
+# 
+# echo ""
+# echo ""
 
 echo "add_bridges.sh: "
 echo "add_bridges.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
@@ -146,9 +146,9 @@ time ./groups/add_bridges.sh
 echo ""
 echo ""
 
-echo "add_ports.sh: "
-echo "add_ports.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
-time ./groups/add_ports.sh
+# echo "add_ports.sh: "
+# echo "add_ports.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
+# time ./groups/add_ports.sh
 
 echo ""
 echo ""
@@ -161,33 +161,33 @@ sleep 10
 echo ""
 echo ""
 
-echo "dns_routes"
-echo "dns_routes $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
-time ./groups/dns_routes.sh
+# echo "dns_routes"
+# echo "dns_routes $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
+# time ./groups/dns_routes.sh
+# 
+# echo ""
+# echo ""
 
-echo ""
-echo ""
+# echo "l2_init_switch.sh: "
+# echo "l2_init_switch.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
+# time ./groups/l2_init_switch.sh
+# 
+# echo ""
+# echo ""
 
-echo "l2_init_switch.sh: "
-echo "l2_init_switch.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
-time ./groups/l2_init_switch.sh
+# echo "add_vpns.sh: "
+# echo "add_vpns.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
+# time ./groups/add_vpns.sh
+# 
+# echo ""
+# echo ""
 
-echo ""
-echo ""
-
-echo "add_vpns.sh: "
-echo "add_vpns.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
-time ./groups/add_vpns.sh
-
-echo ""
-echo ""
-
-echo "layer2_config.sh: "
-echo "layer2_config.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
-time ./setup/layer2_config.sh "${DIRECTORY}"
-
-echo ""
-echo ""
+# echo "layer2_config.sh: "
+# echo "layer2_config.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
+# time ./setup/layer2_config.sh "${DIRECTORY}"
+# 
+# echo ""
+# echo ""
 
 echo "router_config.sh: "
 echo "router_config.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
@@ -204,9 +204,9 @@ time ./groups/delay_throughput.sh
 echo ""
 echo ""
 
-echo "throughput.sh: "
-echo "throughput.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
-time ./groups/throughput.sh
+# echo "throughput.sh: "
+# echo "throughput.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
+# time ./groups/throughput.sh
 
 echo "Run ./groups/open_vpn_ports.sh to open the ports used by the vpn servers."
 echo "END $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
@@ -214,7 +214,7 @@ echo "END $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
 echo ""
 echo ""
 
-# restart dns server with new configs
-docker exec -d DNS service bind9 restart
+# # restart dns server with new configs
+# docker exec -d DNS service bind9 restart
 
 echo "$(date +%Y-%m-%d_%H-%M-%S)"

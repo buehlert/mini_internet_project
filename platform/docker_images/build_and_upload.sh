@@ -17,44 +17,44 @@ docker build --tag=d_matrix docker_images/matrix/
 docker build --tag=d_vpn docker_images/vpn/
 
 
-docker login
+# docker login
 
 # If you want to use your custom docker containers and upload them into
 # docker hub, change the docker username with your own docker username.
-docker_name=thomahol
+docker_name=buehlert
 
 container_name=d_router
 docker tag "${container_name}" "${docker_name}"/"${container_name}"
-docker push "${docker_name}"/"${container_name}"
+# docker push "${docker_name}"/"${container_name}"
 
 container_name=d_ixp
 docker tag "${container_name}" "${docker_name}"/"${container_name}"
-docker push "${docker_name}"/"${container_name}"
+# docker push "${docker_name}"/"${container_name}"
 
 container_name=d_host
 docker tag "${container_name}" "${docker_name}"/"${container_name}"
-docker push "${docker_name}"/"${container_name}"
+# docker push "${docker_name}"/"${container_name}"
 
 container_name=d_ssh
 docker tag "${container_name}" "${docker_name}"/"${container_name}"
-docker push "${docker_name}"/"${container_name}"
+# docker push "${docker_name}"/"${container_name}"
 
 container_name=d_measurement
 docker tag "${container_name}" "${docker_name}"/"${container_name}"
-docker push "${docker_name}"/"${container_name}"
+# docker push "${docker_name}"/"${container_name}"
 
 container_name=d_dns
 docker tag "${container_name}" "${docker_name}"/"${container_name}"
-docker push "${docker_name}"/"${container_name}"
+# docker push "${docker_name}"/"${container_name}"
 
 container_name=d_switch
 docker tag "${container_name}" "${docker_name}"/"${container_name}"
-docker push "${docker_name}"/"${container_name}"
+# docker push "${docker_name}"/"${container_name}"
 
 container_name=d_matrix
 docker tag "${container_name}" "${docker_name}"/"${container_name}"
-docker push "${docker_name}"/"${container_name}"
+# docker push "${docker_name}"/"${container_name}"
 
 container_name=d_vpn
 docker tag "${container_name}" "${docker_name}"/"${container_name}"
-docker push "${docker_name}"/"${container_name}"
+# docker push "${docker_name}"/"${container_name}"

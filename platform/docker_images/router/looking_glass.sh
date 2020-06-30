@@ -12,9 +12,9 @@ do
   vtysh -c 'write'
 
   # needed to remove weird interface names when frr starts..
-  for intf_name in $(vtysh -c 'show interface brief' | grep _c | cut -f 1 -d ' '); do
-      vtysh -c "conf t" -c "interface $intf_name" -c "shutdown" -c "exit" -c "no interface $intf_name"
-  done
+  # for intf_name in $(vtysh -c 'show interface brief' | grep _c | cut -f 1 -d ' '); do
+  #     vtysh -c "conf t" -c "interface $intf_name" -c "shutdown" -c "exit" -c "no interface $intf_name"
+  # done
 
 
 done

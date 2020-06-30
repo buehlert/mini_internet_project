@@ -52,7 +52,7 @@ for ((k=0;k<group_numbers;k++)); do
                dest_router_id=$i;
            fi
         done
-        subnet="$(subnet_host_router "${group_number}" "$dest_router_id" host)"
+        subnet="$(subnet_host_router_hijack "${group_number}" "$dest_router_id" host)"
         echo $group_number" "${subnet%/*} >> ${location}/destination_ips.txt
 
         for ((i=0;i<n_routers;i++)); do

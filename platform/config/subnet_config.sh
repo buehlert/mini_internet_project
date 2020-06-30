@@ -14,6 +14,24 @@ subnet_group () {
   echo "${n_grp}"".0.0.0/8"
 }
 
+subnet_host_router_hijack () {
+  local n_grp="$1" n_router="$2" device="$3"
+
+  if [ "$device" = "host" ] ; then
+
+    echo "${n_grp}"".""$(($n_router+101))"".0.1/26"
+
+  elif [ "$device" = "router" ] ; then
+
+    echo "${n_grp}"".""$(($n_router+101))"".0.2/26"
+
+  elif [ "$device" = "bridge" ] ; then
+
+    echo "${n_grp}"".""$(($n_router+101))"".0.0 netmask 255.255.252.0"
+
+  fi
+}
+
 subnet_host_router () {
   local n_grp="$1" n_router="$2" device="$3"
 

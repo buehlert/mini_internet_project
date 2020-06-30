@@ -65,7 +65,7 @@ for ((kk=0;kk<n_groups;kk++)); do
                    fi
                 done
 
-                subnet="$(subnet_host_router "${group_number_jj}" "$dest_router_id" host)"
+                subnet="$(subnet_host_router_hijack "${group_number_jj}" "$dest_router_id" host)"
 
                 mod=$((${group_number_kk} % 100))
                 div=$((${group_number_kk} / 100))
