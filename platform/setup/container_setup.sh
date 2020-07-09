@@ -80,6 +80,8 @@ for ((k=0;k<group_numbers;k++)); do
                     --cpus=2 --pids-limit 100 --hostname "${hname}" \
                     --name="${group_number}""_L2_""${l2name}""_""${hname}" \
                     --sysctl net.ipv4.icmp_ratelimit=0 \
+                    --sysctl net.ipv4.conf.default.rp_filter=0 \
+                    --sysctl net.ipv4.conf.all.rp_filter=0 \
                     -v /etc/timezone:/etc/timezone:ro \
                     -v /etc/localtime:/etc/localtime:ro buehlert/d_host
             fi
@@ -116,6 +118,8 @@ for ((k=0;k<group_numbers;k++)); do
                     --name="${group_number}""_""${rname}""host" --cap-add=NET_ADMIN \
                     --cpus=2 --pids-limit 100 --hostname "${rname}""_host" \
                     --sysctl net.ipv4.icmp_ratelimit=0 \
+                    --sysctl net.ipv4.conf.default.rp_filter=0 \
+                    --sysctl net.ipv4.conf.all.rp_filter=0 \
                     -v /etc/timezone:/etc/timezone:ro \
                     -v /etc/localtime:/etc/localtime:ro buehlert/d_host \
                     # add this for bgpsimple -v ${DIRECTORY}/docker_images/host/bgpsimple.pl:/home/bgpsimple.pl \
