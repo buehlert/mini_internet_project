@@ -113,8 +113,8 @@ echo ""
 # echo "ssh_setup.sh: "
 # time ./setup/ssh_setup.sh "${DIRECTORY}"
 
-echo ""
-echo ""
+# echo ""
+# echo ""
 
 # echo "echo \"matrix_setup\"" >> "${DIRECTORY}"/groups/ip_setup.sh
 # echo "matrix_setup.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
@@ -128,10 +128,10 @@ echo ""
 # echo "create_ping_scripts.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
 # time ./setup/create_ping_scripts.sh "${DIRECTORY}"
 
-echo ""
-echo ""
+# echo ""
+# echo ""
 
-# echo "echo \"dns links\"" >> "${DIRECTORY}"/groups/ip_setup.sh
+# # echo "echo \"dns links\"" >> "${DIRECTORY}"/groups/ip_setup.sh
 # echo "dns_setup.sh: "
 # echo "dns_setup.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
 # time ./setup/dns_setup.sh "${DIRECTORY}"
@@ -139,19 +139,19 @@ echo ""
 # echo ""
 # echo ""
 
-echo "add_bridges.sh: "
-echo "add_bridges.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
-time ./groups/add_bridges.sh
+# echo "add_bridges.sh: "
+# echo "add_bridges.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
+# time ./groups/add_bridges.sh
 
-echo ""
-echo ""
+# echo ""
+# echo ""
 
 # echo "add_ports.sh: "
 # echo "add_ports.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
 # time ./groups/add_ports.sh
 
-echo ""
-echo ""
+# echo ""
+# echo ""
 
 echo "ip_setup.sh: "
 echo "ip_setup.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
@@ -210,6 +210,20 @@ echo ""
 
 echo "Run ./groups/open_vpn_ports.sh to open the ports used by the vpn servers."
 echo "END $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
+
+echo ""
+echo ""
+
+echo "add_more_prefixes.sh: "
+echo "add_more_prefixes.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
+time ./setup/add_more_prefixes.sh "${DIRECTORY}"
+
+echo ""
+echo ""
+
+echo "prepare_hijack.sh: "
+echo "prepare_hijack.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
+time ./setup/prepare_hijack.sh "${DIRECTORY}"
 
 echo ""
 echo ""
