@@ -1,48 +1,48 @@
-1	aaaa	Provider	2	aaaa	Customer	10000000	10000	179.0.1.0/24
-1	aaaa	Provider	4	aaaa	Customer	10000000	10000	179.0.2.0/24
-1	bbbb	Provider	5	aaaa	Customer	10000000	10000	179.0.3.0/24
-1	aaaa	Customer	3	aaaa	Provider	10000000	10000	179.0.4.0/24
-1	bbbb	Peer	14	N/A	Peer	10000000	40000	1,8,12,13,18,25
-12	aaaa	Provider	3	aaaa	Customer	10000000	20000	179.0.5.0/24
-12	aaaa	Provider	11	aaaa	Customer	10000000	20000	179.0.6.0/24
-12	aaaa	Provider	10	aaaa	Customer	10000000	30000	179.0.7.0/24
-12	aaaa	Peer	21	N/A	Peer	10000000	20000	10,12,22,23,24,30
-12	bbbb	Provider	6	aaaa	Customer	10000000	30000	179.0.8.0/24
-12	bbbb	Peer	20	aaaa	Peer	10000000	30000	179.0.9.0/24
-12	cccc	Provider	13	bbbb	Customer	10000000	20000	179.0.10.0/24
-12	cccc	Provider	16	aaaa	Customer	10000000	30000	179.0.11.0/24
-12	cccc	Peer	14	N/A	Peer	10000000	20000	1,8,12,13,18,25
-10	aaaa	Peer	11	aaaa	Peer	10000000	10000	179.0.12.0/24
-10	bbbb	Peer	21	N/A	Peer	10000000	10000	10,12,22,23,24,30
-13	bbbb	Peer	14	N/A	Peer	10000000	20000	1,8,12,13,18,25
-13	aaaa	Customer	8	aaaa	Provider	10000000	10000	179.0.13.0/24
-20	aaaa	Peer	21	N/A	Peer	10000000	20000	10,12,22,23,24,30
-20	bbbb	Provider	25	aaaa	Customer	10000000	20000	179.0.14.0/24
-20	bbbb	Provider	27	aaaa	Customer	10000000	20000	179.0.15.0/24
-20	cccc	Provider	19	aaaa	Customer	10000000	10000	179.0.16.0/24
-20	cccc	Provider	29	aaaa	Customer	10000000	10000	179.0.17.0/24
-6	aaaa	Provider	7	aaaa	Customer	10000000	10000	179.0.18.0/24
-6	aaaa	Peer	8	aaaa	Peer	10000000	10000	179.0.19.0/24
-7	aaaa	Customer	8	aaaa	Provider	10000000	10000	179.0.20.0/24
-8	aaaa	Peer	14	N/A	Peer	10000000	30000	1,8,12,13,18,25
-9	aaaa	Customer	11	aaaa	Provider	10000000	10000	179.0.21.0/24
-15	aaaa	Customer	16	aaaa	Provider	10000000	10000	179.0.22.0/24
-17	aaaa	Customer	16	aaaa	Provider	10000000	10000	179.0.23.0/24
-17	aaaa	Customer	18	aaaa	Provider	10000000	10000	179.0.24.0/24
-18	aaaa	Customer	16	aaaa	Provider	10000000	10000	179.0.25.0/24
-18	aaaa	Customer	19	aaaa	Provider	10000000	10000	179.0.26.0/24
-18	aaaa	Peer	14	N/A	Peer	10000000	20000	1,8,12,13,18,25
-19	aaaa	Peer	29	aaaa	Peer	10000000	10000	179.0.27.0/24
-22	aaaa	Peer	23	aaaa	Peer	10000000	10000	179.0.28.0/24
-22	aaaa	Peer	24	aaaa	Peer	10000000	10000	179.0.29.0/24
-22	aaaa	Peer	21	N/A	Peer	10000000	10000	10,12,22,23,24,30
-23	aaaa	Peer	24	aaaa	Peer	10000000	10000	179.0.30.0/24
-23	aaaa	Peer	21	N/A	Peer	10000000	10000	10,12,22,23,24,30
-24	aaaa	Peer	21	N/A	Peer	10000000	10000	10,12,22,23,24,30
-24	aaaa	Provider	30	aaaa	Customer	10000000	10000	179.0.31.0/24
-25	aaaa	Peer	27	aaaa	Peer	10000000	10000	179.0.32.0/24
-25	aaaa	Provider	26	aaaa	Customer	10000000	10000	179.0.33.0/24
-25	aaaa	Peer	14	N/A	Peer	10000000	30000	1,8,12,13,18,25
-26	aaaa	Customer	27	aaaa	Provider	10000000	10000	179.0.34.0/24
-27	aaaa	Peer	29	aaaa	Peer	10000000	10000	179.0.35.0/24
-28	aaaa	Customer	29	aaaa	Provider	10000000	10000	179.0.36.0/24
+1	aaaa	Provider	2	aaaa	Customer	8000000000	10	0	179.0.1.0/24
+1	aaaa	Provider	4	aaaa	Customer	8000000000	10	0	179.0.2.0/24
+1	bbbb	Provider	5	aaaa	Customer	8000000000	10	0	179.0.3.0/24
+1	aaaa	Customer	3	aaaa	Provider	8000000000	10	0	179.0.4.0/24
+1	bbbb	Peer	14	N/A	Peer	8000000000	40	0	1,8,12,13,18,25
+12	aaaa	Provider	3	aaaa	Customer	8000000000	20	0	179.0.5.0/24
+12	aaaa	Provider	11	aaaa	Customer	8000000000	20	0	179.0.6.0/24
+12	aaaa	Provider	10	aaaa	Customer	8000000000	30	0	179.0.7.0/24
+12	cccc	Peer	21	N/A	Peer	8000000000	20	0	10,12,22,23,24,30
+12	bbbb	Provider	6	aaaa	Customer	8000000000	30	0	179.0.8.0/24
+12	bbbb	Peer	20	aaaa	Peer	8000000000	30	0	179.0.9.0/24
+12	cccc	Provider	13	bbbb	Customer	8000000000	20	0	179.0.10.0/24
+12	cccc	Provider	16	aaaa	Customer	8000000000	30	0	179.0.11.0/24
+12	aaaa	Peer	14	N/A	Peer	8000000000	20	0	1,8,12,13,18,25
+10	aaaa	Peer	11	aaaa	Peer	8000000000	10	0	179.0.12.0/24
+10	bbbb	Peer	21	N/A	Peer	8000000000	10	0	10,12,22,23,24,30
+13	bbbb	Peer	14	N/A	Peer	8000000000	20	0	1,8,12,13,18,25
+13	aaaa	Customer	8	aaaa	Provider	8000000000	10	0	179.0.13.0/24
+20	aaaa	Peer	21	N/A	Peer	8000000000	20	0	10,12,22,23,24,30
+20	bbbb	Provider	25	aaaa	Customer	8000000000	20	0	179.0.14.0/24
+20	bbbb	Provider	27	aaaa	Customer	8000000000	20	0	179.0.15.0/24
+20	cccc	Provider	19	aaaa	Customer	8000000000	10	0	179.0.16.0/24
+20	cccc	Provider	29	aaaa	Customer	8000000000	10	0	179.0.17.0/24
+6	aaaa	Provider	7	aaaa	Customer	8000000000	10	0	179.0.18.0/24
+6	aaaa	Peer	8	aaaa	Peer	8000000000	10	0	179.0.19.0/24
+7	aaaa	Customer	8	aaaa	Provider	8000000000	10	0	179.0.20.0/24
+8	aaaa	Peer	14	N/A	Peer	8000000000	30	0	1,8,12,13,18,25
+9	aaaa	Customer	11	aaaa	Provider	8000000000	10	0	179.0.21.0/24
+15	aaaa	Customer	16	aaaa	Provider	8000000000	10	0	179.0.22.0/24
+17	aaaa	Customer	16	aaaa	Provider	8000000000	10	0	179.0.23.0/24
+17	aaaa	Customer	18	aaaa	Provider	8000000000	10	0	179.0.24.0/24
+18	aaaa	Customer	16	aaaa	Provider	8000000000	10	0	179.0.25.0/24
+18	aaaa	Customer	19	aaaa	Provider	8000000000	10	0	179.0.26.0/24
+18	aaaa	Peer	14	N/A	Peer	8000000000	20	0	1,8,12,13,18,25
+19	aaaa	Peer	29	aaaa	Peer	8000000000	10	0	179.0.27.0/24
+22	aaaa	Peer	23	aaaa	Peer	8000000000	10	0	179.0.28.0/24
+22	aaaa	Peer	24	aaaa	Peer	8000000000	10	0	179.0.29.0/24
+22	aaaa	Peer	21	N/A	Peer	8000000000	10	0	10,12,22,23,24,30
+23	aaaa	Peer	24	aaaa	Peer	8000000000	10	0	179.0.30.0/24
+23	aaaa	Peer	21	N/A	Peer	8000000000	10	0	10,12,22,23,24,30
+24	aaaa	Peer	21	N/A	Peer	8000000000	10	0	10,12,22,23,24,30
+24	aaaa	Provider	30	aaaa	Customer	8000000000	10	0	179.0.31.0/24
+25	aaaa	Peer	27	aaaa	Peer	8000000000	10	0	179.0.32.0/24
+25	aaaa	Provider	26	aaaa	Customer	8000000000	10	0	179.0.33.0/24
+25	aaaa	Peer	14	N/A	Peer	8000000000	30	0	1,8,12,13,18,25
+26	aaaa	Customer	27	aaaa	Provider	8000000000	10	0	179.0.34.0/24
+27	aaaa	Peer	29	aaaa	Peer	8000000000	10	0	179.0.35.0/24
+28	aaaa	Customer	29	aaaa	Provider	8000000000	10	0	179.0.36.0/24

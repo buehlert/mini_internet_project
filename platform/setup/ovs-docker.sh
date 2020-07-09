@@ -188,7 +188,6 @@ add_port () {
 
 add_link () {
     # TODO: add support for restarting container script
-    # (TODO: add support for two parallel links between two containers)
 
     INTERFACE_IN="$1"
     CONTAINER_IN="$2"
@@ -199,6 +198,40 @@ add_link () {
     if [ -z "$INTERFACE_IN" ] || [ -z "$CONTAINER_IN" ] || [ -z "$INTERFACE_OUT" ] || [ -z "$CONTAINER_OUT" ]; then
         echo >&2 "$UTIL add_link: not enough arguments (use --help for help)"
         exit 1
+    fi
+
+    # process optional arguments
+    shift 4
+    while [ $# -ne 0 ]; do
+        case $1 in
+            --number=*)
+                NUM=`expr X"$1" : 'X[^=]*=\(.*\)'`
+                shift
+                ;;
+        esac
+    done
+
+    FILE_OUT="groups/ip_setup.sh"
+
+    if [ -n "$NUM" ]; then
+        FILE_OUT="groups/additional_prefix_setup.sh"
+        if [ ! -f $FILE_OUT ]; then
+            touch $FILE_OUT
+            echo "create_netns_link () { ">> $FILE_OUT
+            echo "  mkdir -p /var/run/netns">> $FILE_OUT
+            echo "  if [ ! -e /var/run/netns/"\$PID" ]; then">> $FILE_OUT
+            echo "    ln -s /proc/"\$PID"/ns/net /var/run/netns/"\$PID"">> $FILE_OUT
+            echo "    trap 'delete_netns_link' 0">> $FILE_OUT
+            echo "    for signal in 1 2 3 13 14 15; do">> $FILE_OUT
+            echo "      trap 'delete_netns_link; trap - \$signal; kill -\$signal \$\$' \$signal">> $FILE_OUT
+            echo "     done">> $FILE_OUT
+            echo "  fi">> $FILE_OUT
+            echo "}">> $FILE_OUT
+            echo " ">> $FILE_OUT
+            echo "delete_netns_link () {">> $FILE_OUT
+            echo "  rm -f /var/run/netns/"\$PID"">> $FILE_OUT
+            echo "}">> $FILE_OUT
+        fi
     fi
 
     # make sure we can find PID of both containers
@@ -217,22 +250,26 @@ add_link () {
     # Create a veth pair with "default" names as otherwise multiple interfaces would get the same name
     ID=`uuidgen -s --namespace @url --name "${INTERFACE_IN}_${CONTAINER_IN}" | sed 's/-//g'`
     PORTNAME="${ID:0:13}"
-    echo "#ip link add "${PORTNAME}_i" type veth peer name "${PORTNAME}_o"" >> groups/ip_setup.sh
+    if [ -n "$NUM" ]; then
+        PORTNAME="${ID:0:13-${#NUM}-1}_$NUM"
+    fi
+
+    echo "#ip link add "${PORTNAME}_i" type veth peer name "${PORTNAME}_o"" >> $FILE_OUT
     ip link add "${PORTNAME}_i" type veth peer name "${PORTNAME}_o"
 
     # move INTERFACE_IN inside CONTAINER_IN
-    echo "PID=$(docker inspect -f '{{.State.Pid}}' "${CONTAINER_IN}")">> groups/ip_setup.sh
-    echo "create_netns_link" >> groups/ip_setup.sh
-    echo "ip link set "${PORTNAME}_i" netns "\$PID"" >> groups/ip_setup.sh
-    echo "ip netns exec "\$PID" ip link set dev "${PORTNAME}_i" name "${INTERFACE_IN}"" >> groups/ip_setup.sh
-    echo "ip netns exec "\$PID" ip link set "${INTERFACE_IN}" up" >> groups/ip_setup.sh
+    echo "PID=$(docker inspect -f '{{.State.Pid}}' "${CONTAINER_IN}")">> $FILE_OUT
+    echo "create_netns_link" >> $FILE_OUT
+    echo "ip link set "${PORTNAME}_i" netns "\$PID"" >> $FILE_OUT
+    echo "ip netns exec "\$PID" ip link set dev "${PORTNAME}_i" name "${INTERFACE_IN}"" >> $FILE_OUT
+    echo "ip netns exec "\$PID" ip link set "${INTERFACE_IN}" up" >> $FILE_OUT
 
     # move INTERFACE_OUT inside CONTAINER_OUT
-    echo "PID=$(docker inspect -f '{{.State.Pid}}' "${CONTAINER_OUT}")">> groups/ip_setup.sh
-    echo "create_netns_link" >> groups/ip_setup.sh
-    echo "ip link set "${PORTNAME}_o" netns "\$PID"" >> groups/ip_setup.sh
-    echo "ip netns exec "\$PID" ip link set dev "${PORTNAME}_o" name "${INTERFACE_OUT}"" >> groups/ip_setup.sh
-    echo "ip netns exec "\$PID" ip link set "${INTERFACE_OUT}" up" >> groups/ip_setup.sh
+    echo "PID=$(docker inspect -f '{{.State.Pid}}' "${CONTAINER_OUT}")">> $FILE_OUT
+    echo "create_netns_link" >> $FILE_OUT
+    echo "ip link set "${PORTNAME}_o" netns "\$PID"" >> $FILE_OUT
+    echo "ip netns exec "\$PID" ip link set dev "${PORTNAME}_o" name "${INTERFACE_OUT}"" >> $FILE_OUT
+    echo "ip netns exec "\$PID" ip link set "${INTERFACE_OUT}" up" >> $FILE_OUT
 
     # add commands to delete
     echo "PID_IN=$(docker inspect -f '{{.State.Pid}}' "${CONTAINER_IN}")">> groups/delete_veth_pairs.sh
@@ -257,6 +294,10 @@ mod_interface_properties () {
     shift 2
     while [ $# -ne 0 ]; do
         case $1 in
+            --number=*)
+                NUM=`expr X"$1" : 'X[^=]*=\(.*\)'`
+                shift
+                ;;
             --ipaddress=*)
                 ADDRESS=`expr X"$1" : 'X[^=]*=\(.*\)'`
                 shift
@@ -281,6 +322,14 @@ mod_interface_properties () {
                 THROUGHPUT=`expr X"$1" : 'X[^=]*=\(.*\)'`
                 shift
                 ;;
+            --flowgrind=*)
+                FLOWGRIND=`expr X"$1" : 'X[^=]*=\(.*\)'`
+                shift
+                ;;
+            --loss=*)
+                LOSS=`expr X"$1" : 'X[^=]*=\(.*\)'`
+                shift
+                ;;
             *)
                 echo >&2 "$UTIL add-port: unknown option \"$1\""
                 exit 1
@@ -294,40 +343,70 @@ mod_interface_properties () {
         exit 1
     fi
 
+    FILE_OUT="groups/ip_setup.sh"
+    FILE_DELAY="groups/delay_throughput.sh"
+
+    if [ -n "$NUM" ]; then
+        FILE_OUT="groups/additional_prefix_setup.sh"
+        FILE_DELAY="groups/additional_prefix_setup.sh"
+        if [ ! -f $FILE_OUT ]; then
+            touch $FILE_OUT
+        fi
+    fi
+
     # modify MTU
     if [ -n "$MTU" ]; then
-        echo "PID=$(docker inspect -f '{{.State.Pid}}' "${CONTAINER}")">> groups/ip_setup.sh
-        echo "ip netns exec "\$PID" ip link set dev "${INTERFACE}" mtu "${MTU}"" >> groups/ip_setup.sh
+        echo "PID=$(docker inspect -f '{{.State.Pid}}' "${CONTAINER}")">> $FILE_OUT
+        echo "ip netns exec "\$PID" ip link set dev "${INTERFACE}" mtu "${MTU}"" >> $FILE_OUT
     fi
 
     # modify IP address
     if [ -n "$ADDRESS" ]; then
-        echo "PID=$(docker inspect -f '{{.State.Pid}}' "${CONTAINER}")">> groups/ip_setup.sh
-        echo "ip netns exec "\$PID" ip addr add "${ADDRESS}" dev "${INTERFACE}"" >> groups/ip_setup.sh
+        echo "PID=$(docker inspect -f '{{.State.Pid}}' "${CONTAINER}")">> $FILE_OUT
+        echo "ip netns exec "\$PID" ip addr add "${ADDRESS}" dev "${INTERFACE}"" >> $FILE_OUT
     fi
 
     # modify MAC address
     if [ -n "$MACADDRESS" ]; then
-        echo "PID=$(docker inspect -f '{{.State.Pid}}' "${CONTAINER}")">> groups/ip_setup.sh
-        echo "ip netns exec "\$PID" ip link set dev "${INTERFACE}" address "${MACADDRESS}"" >> groups/ip_setup.sh
+        echo "PID=$(docker inspect -f '{{.State.Pid}}' "${CONTAINER}")">> $FILE_OUT
+        echo "ip netns exec "\$PID" ip link set dev "${INTERFACE}" address "${MACADDRESS}"" >> $FILE_OUT
     fi
 
     # add default gateway
     if [ -n "$GATEWAY" ]; then
-        echo "PID=$(docker inspect -f '{{.State.Pid}}' "${CONTAINER}")">> groups/ip_setup.sh
-        echo "ip netns exec "\$PID" ip route add default via "${GATEWAY}"" >> groups/ip_setup.sh
+        echo "PID=$(docker inspect -f '{{.State.Pid}}' "${CONTAINER}")">> $FILE_OUT
+        echo "ip netns exec "\$PID" ip route add default via "${GATEWAY}"" >> $FILE_OUT
     fi
 
-    # add delay and/or throughput
-    if [ -n "$DELAY" ] || [ -n "$THROUGHPUT" ]; then
-        echo "PID=$(docker inspect -f '{{.State.Pid}}' "${CONTAINER}")">> groups/delay_throughput.sh
-        if [ -z "$DELAY" ]; then
-            echo "ip netns exec "\$PID" tc qdisc add dev "${INTERFACE}" root netem rate "${THROUGHPUT}"" >> groups/delay_throughput.sh
-        elif [ -z "$THROUGHPUT" ]; then
-            echo "ip netns exec "\$PID" tc qdisc add dev "${INTERFACE}" root netem delay "${DELAY}"" >> groups/delay_throughput.sh
-        else
-            echo "ip netns exec "\$PID" tc qdisc add dev "${INTERFACE}" root netem rate "${THROUGHPUT}" delay "${DELAY}"" >> groups/delay_throughput.sh
+    # enable flowgrind server
+    if [ -n "$FLOWGRIND" ]; then    
+        echo "docker exec -d "${CONTAINER}" flowgrindd -b "${FLOWGRIND}"" >> $FILE_OUT
+    fi
+
+    # add delay, throughput and loss
+    if [ -n "$DELAY" ] || [ -n "$THROUGHPUT" ] || [ -n "$LOSS" ]; then
+        echo "PID=$(docker inspect -f '{{.State.Pid}}' "${CONTAINER}")">> $FILE_DELAY
+        # echo "ip netns exec "\$PID" tc qdisc del dev "${INTERFACE}" root" >> $FILE_DELAY
+
+        to_add="ip netns exec "\$PID" tc qdisc add dev "${INTERFACE}" root netem limit 100000"
+        if [ -n "$THROUGHPUT" ]; then
+            to_add=""${to_add}" rate "${THROUGHPUT}""
         fi
+        if [ -n "$DELAY" ]; then
+            IFS=',' read -r -a delay_parts <<< "${DELAY}"
+            if [ "${#delay_parts[@]}" == "2" ]; then
+                to_add=""${to_add}" delay "${delay_parts[0]}"ms "${delay_parts[1]}"ms distribution normal"
+            else
+                to_add=""${to_add}" delay "${delay_parts[0]}"ms"
+            fi
+        fi
+        if [ -n "$LOSS" ]; then
+            if [ "${LOSS}" != "0" ];then
+                to_add=""${to_add}" loss "${LOSS}"%"
+            fi
+        fi
+
+        echo "${to_add}" >> $FILE_DELAY
     fi
 }
 

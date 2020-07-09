@@ -44,9 +44,17 @@ for ((k=0;k<group_numbers;k++)); do
                 subnet_bridge="$(subnet_host_router_hijack "${group_number}" "${i}" "bridge")"
                 subnet_router="$(subnet_host_router_hijack "${group_number}" "${i}" "router")"
                 subnet_host="$(subnet_host_router_hijack "${group_number}" "${i}" "host")"
+                IFS='/' read -r -a address <<< "${subnet_host}"
+                host_ip_address="${address[0]}"
 
                 ./setup/ovs-docker.sh add-link "host" "${group_number}"_"${rname}"router \
                     "${rname}""router" "${group_number}"_"${rname}"host
+
+                # new, add fixed delay and throuput for router-host links (no loss so far)
+                ./setup/ovs-docker.sh mod-interface-properties "host" "${group_number}"_"${rname}"router \
+                    --delay=10 --throughput=8000000000
+                ./setup/ovs-docker.sh mod-interface-properties "${rname}""router" "${group_number}"_"${rname}"host \
+                    --delay=10 --throughput=8000000000
 
                 # ./setup/ovs-docker.sh add-port ${br_name} "host"  \
                 # "${group_number}"_"${rname}"router
@@ -62,6 +70,8 @@ for ((k=0;k<group_numbers;k++)); do
                 if [ "$group_config" == "Config" ]; then
                     echo "docker exec -d "${group_number}"_"${rname}"host ifconfig "${rname}"router "${subnet_host}" up" >> "${DIRECTORY}"/groups/ip_setup.sh
                     echo "docker exec -d "${group_number}"_"${rname}"host ip route add default via "${subnet_router%/*} >> "${DIRECTORY}"/groups/ip_setup.sh
+                    ./setup/ovs-docker.sh mod-interface-properties "${rname}""router" "${group_number}"_"${rname}"host \
+                    --flowgrind="${host_ip_address}"
                 fi
             fi
         done

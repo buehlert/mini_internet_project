@@ -49,15 +49,17 @@ for ((k=0;k<group_numbers;k++)); do
                 delay_array_index=$((group_number%${#delay_array[@]}))
                 delay="${delay_array[$delay_array_index]}"
 
+                loss="${row_i[4]}"
+
                 subnet_router1="$(subnet_router_router_intern ${group_number} ${i} 1)"
                 subnet_router2="$(subnet_router_router_intern ${group_number} ${i} 2)"
 
                 ./setup/ovs-docker.sh add-link "port_""${router2}" "${group_number}"_"${router1}"router \
                     "port_""${router1}" "${group_number}"_"${router2}"router
                 ./setup/ovs-docker.sh mod-interface-properties "port_""${router2}" "${group_number}"_"${router1}"router \
-                    --delay="${delay}" --throughput="${throughput}"
+                    --delay="${delay}" --throughput="${throughput}" --loss="${loss}"
                 ./setup/ovs-docker.sh mod-interface-properties "port_""${router1}" "${group_number}"_"${router2}"router \
-                    --delay="${delay}" --throughput="${throughput}"
+                    --delay="${delay}" --throughput="${throughput}" --loss="${loss}"
 
                 # ./setup/ovs-docker.sh add-port "${br_name}" "port_""${router2}" \
                 # "${group_number}"_"${router1}"router --delay="${delay}" --throughput="${throughput}"
