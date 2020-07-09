@@ -204,6 +204,7 @@ for ((i=0;i<n_extern_links;i++)); do
     relation_grp_2="${row_i[5]}"
     throughput="${row_i[6]}"
     delay="${row_i[7]}"
+    loss="${row_i[8]}"
 
     for ((k=0;k<group_numbers;k++)); do
         group_k=(${groups[$k]})
@@ -225,7 +226,7 @@ for ((i=0;i<n_extern_links;i++)); do
             router_grp_2="${row_i[1]}"
         fi
 
-        ixp_peers="${row_i[8]}"
+        ixp_peers="${row_i[9]}"
 
         subnet1="$(subnet_router_IXP "${grp_1}" "${grp_2}" "group")"
         subnet2="$(subnet_router_IXP "${grp_1}" "${grp_2}" "IXP")"
@@ -262,7 +263,7 @@ for ((i=0;i<n_extern_links;i++)); do
         echo " -c 'exit' \\" >> "${location}"
 
     else
-        subnet="${row_i[8]}"
+        subnet="${row_i[9]}"
 
         if [ "$subnet" != "N/A" ]; then
             subnet1=${subnet%????}1/24
@@ -278,6 +279,7 @@ for ((i=0;i<n_extern_links;i++)); do
         echo " -c 'exit' \\" >> "${location1}"
         echo " -c 'router bgp "${grp_1}"' \\" >> "${location1}"
         echo " -c 'neighbor "${subnet2%???}" remote-as "${grp_2}"' \\" >> "${location1}"
+        echo " -c 'neighbor "${subnet2%???}" bfd' \\" >> "${location1}"
         echo " -c 'neighbor "${subnet2%???}" route-map LOCAL_PREF_IN_${grp_2} in' \\" >> "${location1}"
         echo " -c 'neighbor "${subnet2%???}" route-map LOCAL_PREF_OUT_${grp_2} out' \\" >> "${location1}"
         echo " -c 'network "$(subnet_group "${grp_1}")"' \\" >> "${location1}"
@@ -329,6 +331,7 @@ for ((i=0;i<n_extern_links;i++)); do
         echo " -c 'exit' \\" >> "${location2}"
         echo " -c 'router bgp "${grp_2}"' \\" >> "${location2}"
         echo " -c 'neighbor "${subnet1%???}" remote-as "${grp_1}"' \\" >> "${location2}"
+        echo " -c 'neighbor "${subnet1%???}" bfd' \\" >> "${location2}"
         echo " -c 'neighbor "${subnet1%???}" route-map LOCAL_PREF_IN_${grp_1} in' \\" >> "${location2}"
         echo " -c 'neighbor "${subnet1%???}" route-map LOCAL_PREF_OUT_${grp_1} out' \\" >> "${location2}"
         echo " -c 'network "$(subnet_group "${grp_2}")"' \\" >> "${location2}"
