@@ -84,7 +84,7 @@ echo "create_netns_link () { ">> "${location}"/ip_setup.sh
 echo "  mkdir -p /var/run/netns">> "${location}"/ip_setup.sh
 echo "  if [ ! -e /var/run/netns/"\$PID" ]; then">> "${location}"/ip_setup.sh
 echo "    ln -s /proc/"\$PID"/ns/net /var/run/netns/"\$PID"">> "${location}"/ip_setup.sh
-echo "    trap 'delete_netns_link' 0">> "${location}"/ip_setup.sh
+# echo "    trap 'delete_netns_link' 0">> "${location}"/ip_setup.sh
 echo "    for signal in 1 2 3 13 14 15; do">> "${location}"/ip_setup.sh
 echo "      trap 'delete_netns_link; trap - \$signal; kill -\$signal \$\$' \$signal">> "${location}"/ip_setup.sh
 echo "     done">> "${location}"/ip_setup.sh
