@@ -44,15 +44,16 @@ for ((i=0;i<n_hijacks;i++)); do
     echo "-c 'exit' \\" >> "${location}"
     echo "-c 'ip prefix-list OWN_PREFIX seq "$((100+$i))" permit "${prefix}"' \\" >> "${location}"
     
-    echo "-c 'exit' \\" >> "${location}"
-    echo "-c 'write'" >> "${location}"
+    #echo "# enable/disable hijack" >> "${location}"
+    #echo "# conf t" >> "${location}"
+    #echo "# router bgp "${grp}"" >> "${location}"
+    #echo "# network "${prefix}" route-map HIJACK" >> "${location}"
+    #echo "# no network "${prefix}" route-map HIJACK" >> "${location}"
 
-    echo "# enable/disable hijack" >> "${location}"
-    echo "# conf t" >> "${location}"
-    echo "# router bgp "${grp}"" >> "${location}"
-    echo "# network "${prefix}" route-map HIJACK" >> "${location}"
-    echo "# no network "${prefix}" route-map HIJACK" >> "${location}"
-
-    docker cp "${location}" "${grp}"_"${router}"router:/home/add_hijacks.sh
-    docker exec -d "${grp}"_"${router}"router bash ./home/add_hijacks.sh &
 done
+
+echo "-c 'exit' \\" >> "${location}"
+echo "-c 'write'" >> "${location}"
+
+docker cp "${location}" "${grp}"_"${router}"router:/home/add_hijacks.sh
+docker exec -d "${grp}"_"${router}"router bash ./home/add_hijacks.sh &
