@@ -11,11 +11,11 @@ DIRECTORY=$(cd `dirname $0` && pwd)
 
 echo "$(date +%Y-%m-%d_%H-%M-%S)"
 
-echo "cleanup.sh: "
-time ./cleanup/cleanup.sh "${DIRECTORY}"
+#echo "cleanup.sh: "
+#time ./cleanup/cleanup.sh "${DIRECTORY}"
 
-echo ""
-echo ""
+#echo ""
+#echo ""
 
 # change size of ARP table necessary for large networks
 sysctl net.ipv4.neigh.default.gc_thresh1=4096
@@ -47,19 +47,19 @@ echo ""
 # echo ""
 # echo ""
 
-echo "goto_scripts.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
-echo "goto_scripts.sh: "
-time ./setup/goto_scripts.sh "${DIRECTORY}"
+#echo "goto_scripts.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
+#echo "goto_scripts.sh: "
+#time ./setup/goto_scripts.sh "${DIRECTORY}"
 
-echo ""
-echo ""
+#echo ""
+#echo ""
 
-echo "save_configs.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
-echo "save_configs.sh: "
-time ./setup/save_configs.sh "${DIRECTORY}"
+#echo "save_configs.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
+#echo "save_configs.sh: "
+#time ./setup/save_configs.sh "${DIRECTORY}"
 
-echo ""
-echo ""
+#echo ""
+#echo ""
 
 echo "container_setup.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
 echo "container_setup.sh: "
@@ -214,19 +214,19 @@ echo "END $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
 echo ""
 echo ""
 
-echo "add_more_prefixes.sh: "
-echo "add_more_prefixes.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
-time ./setup/add_more_prefixes.sh "${DIRECTORY}"
+#echo "add_more_prefixes.sh: "
+#echo "add_more_prefixes.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
+#time ./setup/add_more_prefixes.sh "${DIRECTORY}"
 
-echo ""
-echo ""
+#echo ""
+#echo ""
 
-echo "prepare_hijack.sh: "
-echo "prepare_hijack.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
-time ./setup/prepare_hijack.sh "${DIRECTORY}"
+#echo "prepare_hijack.sh: "
+#echo "prepare_hijack.sh $(($(date +%s%N)/1000000))" >> "${DIRECTORY}"/log.txt
+#time ./setup/prepare_hijack.sh "${DIRECTORY}"
 
-echo ""
-echo ""
+#echo ""
+#echo ""
 
 # # restart dns server with new configs
 # docker exec -d DNS service bind9 restart
