@@ -11,10 +11,36 @@ set -o nounset
 subnet_group () {
   local n_grp="$1"
 
-  echo "${n_grp}"".0.0.0/8"
+  mod=$((${n_grp} % 100))
+  div=$((${n_grp} / 100))
+  div=$((${div} + 1))
+
+  echo "${div}"".""${mod}"".0.0/16"
 }
 
 subnet_host_router_hijack () {
+  local n_grp="$1" n_router="$2" device="$3"
+
+  mod=$((${n_grp} % 100))
+  div=$((${n_grp} / 100))
+  div=$((${div} + 1))
+
+  if [ "$device" = "host" ] ; then
+
+    echo "${div}"".""${mod}"".""$(($n_router+101))"".1/24"
+
+  elif [ "$device" = "router" ] ; then
+
+    echo "${div}"".""${mod}"".""$(($n_router+101))"".2/24"
+
+  elif [ "$device" = "bridge" ] ; then
+
+    echo "${n_grp}"".""$(($n_router+101))"".0.0 netmask 255.255.252.0"
+
+  fi
+}
+
+subnet_host_router_hijack_old () {
   local n_grp="$1" n_router="$2" device="$3"
 
   if [ "$device" = "host" ] ; then
@@ -71,19 +97,27 @@ gw_l2_ () {
 subnet_router () {
   local n_grp="$1" n_router="$2"
 
-  echo "${n_grp}"".""$(($n_router+151))"".0.1/24"
+  mod=$((${n_grp} % 100))
+  div=$((${n_grp} / 100))
+  div=$((${div} + 1))
+
+  echo "${div}"".""${mod}"".""$(($n_router+151))"".1/24"
 }
 
 subnet_router_router_intern () {
   local n_grp="$1" n_net="$2" device="$3"
 
+  mod=$((${n_grp} % 100))
+  div=$((${n_grp} / 100))
+  div=$((${div} + 1))
+
   if [ "${device}" = "1" ] ; then
 
-    echo "${n_grp}"".0."$((${n_net}+1))".1/24"
+    echo "${div}"".""${mod}""."$((${n_net}+1))".1/24"
 
   elif [ "${device}" = "2" ] ; then
 
-    echo "${n_grp}"".0."$((${n_net}+1))".2/24"
+    echo "${div}"".""${mod}""."$((${n_net}+1))".2/24"
 
   elif [ "${device}" = "bridge" ] ; then
 
@@ -114,6 +148,7 @@ subnet_router_router_extern () {
 }
 
 subnet_router_IXP () {
+  # TODO
   local n_grp="$1" n_ixp="$2" device="$3"
 
   if [ "${device}" = "group" ] ; then
