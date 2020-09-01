@@ -208,6 +208,10 @@ add_link () {
                 NUM=`expr X"$1" : 'X[^=]*=\(.*\)'`
                 shift
                 ;;
+            --number2=*)
+                NUM2=`expr X"$1" : 'X[^=]*=\(.*\)'`
+                shift
+                ;;
         esac
     done
 
@@ -215,6 +219,27 @@ add_link () {
 
     if [ -n "$NUM" ]; then
         FILE_OUT="groups/additional_prefix_setup.sh"
+        if [ ! -f $FILE_OUT ]; then
+            touch $FILE_OUT
+            echo "create_netns_link () { ">> $FILE_OUT
+            echo "  mkdir -p /var/run/netns">> $FILE_OUT
+            echo "  if [ ! -e /var/run/netns/"\$PID" ]; then">> $FILE_OUT
+            echo "    ln -s /proc/"\$PID"/ns/net /var/run/netns/"\$PID"">> $FILE_OUT
+            echo "    trap 'delete_netns_link' 0">> $FILE_OUT
+            echo "    for signal in 1 2 3 13 14 15; do">> $FILE_OUT
+            echo "      trap 'delete_netns_link; trap - \$signal; kill -\$signal \$\$' \$signal">> $FILE_OUT
+            echo "     done">> $FILE_OUT
+            echo "  fi">> $FILE_OUT
+            echo "}">> $FILE_OUT
+            echo " ">> $FILE_OUT
+            echo "delete_netns_link () {">> $FILE_OUT
+            echo "  rm -f /var/run/netns/"\$PID"">> $FILE_OUT
+            echo "}">> $FILE_OUT
+        fi
+    fi
+
+    if [ -n "$NUM2" ]; then
+        FILE_OUT="groups/additional_host_container_setup.sh"
         if [ ! -f $FILE_OUT ]; then
             touch $FILE_OUT
             echo "create_netns_link () { ">> $FILE_OUT
@@ -298,6 +323,10 @@ mod_interface_properties () {
                 NUM=`expr X"$1" : 'X[^=]*=\(.*\)'`
                 shift
                 ;;
+            --number2=*)
+                NUM2=`expr X"$1" : 'X[^=]*=\(.*\)'`
+                shift
+                ;;
             --ipaddress=*)
                 ADDRESS=`expr X"$1" : 'X[^=]*=\(.*\)'`
                 shift
@@ -354,6 +383,14 @@ mod_interface_properties () {
         fi
     fi
 
+    if [ -n "$NUM2" ]; then
+        FILE_OUT="groups/additional_host_container_setup.sh"
+        FILE_DELAY="groups/additional_host_container_setup.sh"
+        if [ ! -f $FILE_OUT ]; then
+            touch $FILE_OUT
+        fi
+    fi
+
     # modify MTU
     if [ -n "$MTU" ]; then
         echo "PID=$(docker inspect -f '{{.State.Pid}}' "${CONTAINER}")">> $FILE_OUT
@@ -386,7 +423,7 @@ mod_interface_properties () {
     # add delay, throughput and loss
     if [ -n "$DELAY" ] || [ -n "$THROUGHPUT" ] || [ -n "$LOSS" ]; then
         echo "PID=$(docker inspect -f '{{.State.Pid}}' "${CONTAINER}")">> $FILE_DELAY
-        # echo "ip netns exec "\$PID" tc qdisc del dev "${INTERFACE}" root" >> $FILE_DELAY
+        echo "ip netns exec "\$PID" tc qdisc del dev "${INTERFACE}" root" >> $FILE_DELAY
 
         to_add="ip netns exec "\$PID" tc qdisc add dev "${INTERFACE}" root netem limit 100000"
         if [ -n "$THROUGHPUT" ]; then
@@ -395,7 +432,7 @@ mod_interface_properties () {
         if [ -n "$DELAY" ]; then
             IFS=',' read -r -a delay_parts <<< "${DELAY}"
             if [ "${#delay_parts[@]}" == "2" ]; then
-                to_add=""${to_add}" delay "${delay_parts[0]}"ms "${delay_parts[1]}"ms distribution normal"
+                to_add=""${to_add}" delay "${delay_parts[0]}"ms "${delay_parts[1]}"ms distribution pareto"
             else
                 to_add=""${to_add}" delay "${delay_parts[0]}"ms"
             fi
