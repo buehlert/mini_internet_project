@@ -432,7 +432,7 @@ mod_interface_properties () {
         if [ -n "$DELAY" ]; then
             IFS=',' read -r -a delay_parts <<< "${DELAY}"
             if [ "${#delay_parts[@]}" == "2" ]; then
-                to_add=""${to_add}" delay "${delay_parts[0]}"ms "${delay_parts[1]}"ms distribution pareto"
+                to_add=""${to_add}" delay "${delay_parts[0]}"ms "${delay_parts[1]}"ms distribution normal"
             else
                 to_add=""${to_add}" delay "${delay_parts[0]}"ms"
             fi

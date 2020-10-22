@@ -22,6 +22,24 @@ for ((i=0;i<n_hijacks;i++)); do
     next_hop="${hijack_i[3]}"
     prepending="${hijack_i[4]}"
 
+    location="${DIRECTORY}"/groups/g"${grp}"/"${router}"/add_hijack.sh
+
+    if [ -f $location ]; then
+        rm $location
+        touch $location
+        chmod +x $location
+    fi
+
+done
+
+for ((i=0;i<n_hijacks;i++)); do
+    hijack_i=(${hijacks[$i]})
+    grp="${hijack_i[0]}"
+    router="${hijack_i[1]}"
+    prefix="${hijack_i[2]}"
+    next_hop="${hijack_i[3]}"
+    prepending="${hijack_i[4]}"
+
     IFS=',' read -r -a to_prepend <<< "${prepending}"
     n_ases=${#to_prepend[@]}
     prepend_string=""
@@ -31,29 +49,42 @@ for ((i=0;i<n_hijacks;i++)); do
 
     location="${DIRECTORY}"/groups/g"${grp}"/"${router}"/add_hijack.sh
 
-    if [ ! -f $location ]; then
-        touch $location
-        chmod +x $location
-        echo "#!/bin/bash" >> "${location}"
-        echo "vtysh -c 'conf t' \\" >> "${location}"
-    fi
+    echo "#!/bin/bash" >> "${location}"
+    echo "vtysh -c 'conf t' \\" >> "${location}"
 
-    echo "-c 'ip route "${prefix}" "${next_hop}"' \\" >> "${location}"
-    echo "-c 'route-map HIJACK permit 5' \\" >> "${location}"
-    echo "-c 'set as-path prepend"${prepend_string}"' \\" >> "${location}"
-    echo "-c 'exit' \\" >> "${location}"
+    # add static route and add hijacked prefix to OWN_PREFIX route-map
+    echo "-c 'ip route 212.0.0.0/22 "${next_hop}"' \\" >> "${location}"
+    echo "-c 'ip route 212.1.0.0/22 "${next_hop}"' \\" >> "${location}"
+    echo "-c 'ip route 212.2.0.0/22 "${next_hop}"' \\" >> "${location}"
     echo "-c 'ip prefix-list OWN_PREFIX seq "$((100+$i))" permit "${prefix}"' \\" >> "${location}"
+
+    # uncomment if not done outside of the script
+    # echo "-c 'route-map HIJACK permit 5' \\" >> "${location}"
+    # echo "-c 'set as-path prepend"${prepend_string}"' \\" >> "${location}"
+    # echo "-c 'exit' \\" >> "${location}"
     
-    #echo "# enable/disable hijack" >> "${location}"
-    #echo "# conf t" >> "${location}"
-    #echo "# router bgp "${grp}"" >> "${location}"
-    #echo "# network "${prefix}" route-map HIJACK" >> "${location}"
-    #echo "# no network "${prefix}" route-map HIJACK" >> "${location}"
+    # echo "# enable/disable hijack" >> "${location}"
+    # echo "# conf t" >> "${location}"
+    # echo "# router bgp "${grp}"" >> "${location}"
+    # echo "# network "${prefix}" route-map HIJACK" >> "${location}"
+    # echo "# no network "${prefix}" route-map HIJACK" >> "${location}"
 
 done
 
-echo "-c 'exit' \\" >> "${location}"
-echo "-c 'write'" >> "${location}"
+for ((i=0;i<n_hijacks;i++)); do
+    hijack_i=(${hijacks[$i]})
+    grp="${hijack_i[0]}"
+    router="${hijack_i[1]}"
+    prefix="${hijack_i[2]}"
+    next_hop="${hijack_i[3]}"
+    prepending="${hijack_i[4]}"
 
-docker cp "${location}" "${grp}"_"${router}"router:/home/add_hijacks.sh
-docker exec -d "${grp}"_"${router}"router bash ./home/add_hijacks.sh &
+    location="${DIRECTORY}"/groups/g"${grp}"/"${router}"/add_hijack.sh
+
+    echo "-c 'exit' \\" >> "${location}"
+    echo "-c 'write'" >> "${location}"
+
+    docker cp "${location}" "${grp}"_"${router}"router:/home/add_hijacks.sh
+    docker exec -d "${grp}"_"${router}"router bash ./home/add_hijacks.sh &
+
+done
