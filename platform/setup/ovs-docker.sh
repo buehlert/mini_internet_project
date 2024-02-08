@@ -248,6 +248,157 @@ connect_ports () {
 
 }
 
+add_link () {
+    # TODO:
+    # - add support for container restart script and other things
+
+    INTERFACE_IN="$1"
+    CONTAINER_IN="$2"
+    INTERFACE_OUT="$3"
+    CONTAINER_OUT="$4"
+
+    # check that all required arguments are available
+    if [ -z "$INTERFACE_IN" ] || [ -z "$CONTAINER_IN" ] || [ -z "$INTERFACE_OUT" ] || [ -z "$CONTAINER_OUT" ]; then
+        echo >&2 "$UTIL add_link: not enough arguments (use --help for help)"
+        exit 1
+    fi
+
+    shift 4
+    while [ $# -ne 0 ]; do
+        case $1 in
+            # TODO: add support, would need to give two IP addresses at once (for both ends)
+            --ipaddress=*)
+                ADDRESS=${1#*=}
+                shift
+                ;;
+            # TODO: add support, would need to give two MAC addresses at once (for both ends)
+            --macaddress=*)
+                MACADDRESS=${1#*=}
+                shift
+                ;;
+            # TODO: add support, would need to specify on which end
+            --gateway=*)
+                GATEWAY=${1#*=}
+                shift
+                ;;
+            # TODO: add support if needed
+            --mtu=*)
+                MTU=${1#*=}
+                shift
+                ;;
+            # supported
+            --delay=*)
+                DELAY=${1#*=}
+                shift
+                ;;
+            # supported
+            --throughput=*)
+                THROUGHPUT=${1#*=}
+                shift
+                ;;
+            *)
+                echo >&2 "$UTIL add_link: unknown option \"$1\""
+                exit 1
+                ;;
+        esac
+    done
+
+    IP_FILE="groups/ip_setup.sh"
+    DEL_FILE="groups/delete_veth_pairs.sh"
+    DELAY_FILE="groups/delay_throughput.sh"
+
+    # make sure we can find PID of both containers and save them
+    get_docker_pid $CONTAINER_IN
+    PID_IN=$DOCKER_PID
+
+    get_docker_pid $CONTAINER_OUT
+    PID_OUT=$DOCKER_PID
+
+    create_netns_link
+
+    # Create a veth pair
+    if [[ $(lsb_release -rs) == ^16* ]]; then
+        ID=`echo "${INTERFACE_IN}_${CONTAINER_IN}" | sha1sum | sed 's/-//g'`
+    else
+        ID=`uuidgen -s --namespace @url --name "${INTERFACE_IN}_${CONTAINER_IN}" | sed 's/-//g'`
+    fi
+    PORTNAME="${ID:0:13}"
+
+    echo "#ip link add "${PORTNAME}_i" type veth peer name "${PORTNAME}_o"" >> $IP_FILE
+
+    ip link add "${PORTNAME}_i" type veth peer name "${PORTNAME}_o"
+    echo "ip link delete "${PORTNAME}_i >> $DEL_FILE
+
+    # move PORTNAME_i inside CONTAINER_IN and rename to INTERFACE_IN
+    echo "PID=$PID_IN">> $IP_FILE
+    echo "create_netns_link" >> $IP_FILE
+    echo "ip link set "${PORTNAME}_i" netns "\$PID"" >> $IP_FILE
+    echo "ip netns exec "\$PID" ip link set dev "${PORTNAME}_i" name "${INTERFACE_IN}"" >> $IP_FILE
+    echo "ip netns exec "\$PID" ip link set "${INTERFACE_IN}" up" >> $IP_FILE
+
+    # move PORTNAME_o inside CONTAINER_OUT and rename to INTERFACE_OUT
+    echo "PID=$PID_OUT">> $IP_FILE
+    echo "create_netns_link" >> $IP_FILE
+    echo "ip link set "${PORTNAME}_o" netns "\$PID"" >> $IP_FILE
+    echo "ip netns exec "\$PID" ip link set dev "${PORTNAME}_o" name "${INTERFACE_OUT}"" >> $IP_FILE
+    echo "ip netns exec "\$PID" ip link set "${INTERFACE_OUT}" up" >> $IP_FILE
+
+    # add delay and throughput
+    if [ -n "$DELAY" ] || [ -n "$THROUGHPUT" ]; then
+        # We use TBFs (Token Bucket Filters) for bandwidth limitations
+        #
+        # At the moment, we take as burst value 10% of the target rate
+        # -> most of the time this is more than the required minimum but should be better for TCP traffic
+        # -> note that the burst value is in bytes
+        # -> minimum of 1500 (Ethernet MTU)
+        #
+        # At the moment, we take 10% of the defined delay as latency parameter
+        # -> latency is in ms
+        # -> this choice makes sure that we roughly achieve the targeted delay value even under high load
+        #    but might be too small to reach certain rates precisely
+
+        if [ -n "$THROUGHPUT" ]; then
+            temp=$(( THROUGHPUT/10/8*1000 ))
+            burst=$(( temp > 1500 ? temp : 1500 ))
+            if [ -n "$DELAY" ]; then
+                temp=${DELAY%???}
+                temp=$(( temp/10 ))
+
+                latency=$(( temp > 1 ? temp : 1 ))
+            else
+                latency=1
+            fi
+        fi
+
+        # only rate limiting
+        if [ -n "$THROUGHPUT" ] && [ ! -n "$DELAY" ]; then
+            echo "PID=$PID_IN" >> $DELAY_FILE
+            echo "ip netns exec "\$PID" tc qdisc add dev "${INTERFACE_IN}" root tbf rate "${THROUGHPUT}"kbit burst "${burst}" latency "${latency}"ms" >> $DELAY_FILE
+
+            echo "PID=$PID_OUT" >> $DELAY_FILE
+            echo "ip netns exec "\$PID" tc qdisc add dev "${INTERFACE_OUT}" root tbf rate "${THROUGHPUT}"kbit burst "${burst}" latency "${latency}"ms" >> $DELAY_FILE
+
+        # only delay
+        elif [ -n "$DELAY" ] && [ ! -n "$THROUGHPUT" ]; then
+            echo "PID=$PID_IN" >> $DELAY_FILE
+            echo "ip netns exec "\$PID" tc qdisc add dev "${INTERFACE_IN}" root netem delay "${DELAY}"" >> $DELAY_FILE
+
+            echo "PID=$PID_OUT" >> $DELAY_FILE
+            echo "ip netns exec "\$PID" tc qdisc add dev "${INTERFACE_OUT}" root netem delay "${DELAY}"" >> $DELAY_FILE
+
+        # rate limiting and delay
+        elif [ -n "$DELAY" ] && [ -n "$THROUGHPUT" ]; then
+            echo "PID=$PID_IN" >> $DELAY_FILE
+            echo "ip netns exec "\$PID" tc qdisc add dev "${INTERFACE_IN}" root handle 1:0 netem delay "${DELAY}"" >> $DELAY_FILE
+            echo "ip netns exec "\$PID" tc qdisc add dev "${INTERFACE_IN}" parent 1:1 handle 10: tbf rate "${THROUGHPUT}"kbit burst "${burst}" latency "${latency}"ms" >> $DELAY_FILE
+
+            echo "PID=$PID_OUT" >> $DELAY_FILE
+            echo "ip netns exec "\$PID" tc qdisc add dev "${INTERFACE_OUT}" root handle 1:0 netem delay "${DELAY}"" >> $DELAY_FILE
+            echo "ip netns exec "\$PID" tc qdisc add dev "${INTERFACE_OUT}" parent 1:1 handle 10: tbf rate "${THROUGHPUT}"kbit burst "${burst}" latency "${latency}"ms" >> $DELAY_FILE
+        fi
+    fi
+}
+
 UTIL=${0##*/}
 
 if [ "$1" == "add-port" ]; then
@@ -256,4 +407,7 @@ if [ "$1" == "add-port" ]; then
 elif [ "$1" == "connect-ports" ]; then
     shift
     connect_ports "$@"
+elif [ "$1" == "add-link" ]; then
+    shift
+    add_link "$@"
 fi
