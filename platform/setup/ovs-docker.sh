@@ -358,12 +358,17 @@ add_link () {
         #    but might be too small to reach certain rates precisely
 
         if [ -n "$THROUGHPUT" ]; then
-            temp=$(( THROUGHPUT/10/8*1000 ))
+            # remove floating point numbers
+            temp=$( echo $THROUGHPUT | cut -d "." -f 1 )
+            temp=$(( temp/10/8*1000 ))
             burst=$(( temp > 1500 ? temp : 1500 ))
-            if [ -n "$DELAY" ]; then
-                temp=${DELAY%???}
-                temp=$(( temp/10 ))
 
+            if [ -n "$DELAY" ]; then
+                # remove "ms"
+                temp=${DELAY%??}
+                # remove floating point numbers
+                temp=$( echo $temp | cut -d "." -f 1 )
+                temp=$(( temp/10 ))
                 latency=$(( temp > 1 ? temp : 1 ))
             else
                 latency=1
