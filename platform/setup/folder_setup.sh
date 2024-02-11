@@ -35,6 +35,12 @@ for ((k=0;k<group_numbers;k++)); do
             router_i=(${routers[$i]})
             rname="${router_i[0]}"
 
+            if [[ ${#router_i[@]} -gt 4 ]]; then
+                if [[ "${router_i[4]}" == "ALL" && $i -gt 0 ]]; then
+                    break
+                fi
+            fi
+
             location="${DIRECTORY}"/groups/g"${group_number}"/"${rname}"
             mkdir "${location}"
             # router configs are saved periodically in frr.con

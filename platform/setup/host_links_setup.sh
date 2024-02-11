@@ -57,16 +57,21 @@ for ((k=0;k<group_numbers;k++)); do
 
             if [[ ! -z "${dname}" ]];then
 
+                extra=""
+                if [[ ${#router_i[@]} -gt 4 && "${router_i[4]}" == "ALL" ]]; then
+                    extra="${i}"
+                fi
+
                 subnet_router="$(subnet_host_router "${group_number}" "${i}" "router")"
                 subnet_host="$(subnet_host_router "${group_number}" "${i}" "host")"
 
                 # TODO: add delay and throughput if needed
-                ./setup/ovs-docker.sh add-link "host" "${group_number}"_"${rname}"router \
-                "${rname}""router" "${group_number}"_"${rname}"host
+                ./setup/ovs-docker.sh add-link "host""${extra}" "${group_number}"_"${rname}"router \
+                "${rname}""router" "${group_number}"_"${rname}"host"${extra}"
 
                 # set default ip address and default gw in host
                 if [ "$group_config" == "Config" ]; then
-                    get_docker_pid "${group_number}"_"${rname}"host
+                    get_docker_pid "${group_number}"_"${rname}"host"${extra}"
                     echo "PID=$DOCKER_PID" >> "${DIRECTORY}"/groups/ip_setup.sh
                     echo "create_netns_link" >> "${DIRECTORY}"/groups/ip_setup.sh
                     echo "ip netns exec \$PID ip a add "${subnet_host}" dev "${rname}"router" >> "${DIRECTORY}"/groups/ip_setup.sh

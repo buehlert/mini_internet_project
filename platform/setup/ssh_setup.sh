@@ -90,22 +90,34 @@ for ((k=0;k<group_numbers;k++)); do
             l2_switch_cur=0
             l2_host_cur=0
 
-            #ssh login for router"
-            subnet_router="$(subnet_sshContainer_groupContainer "${group_number}" "${i}" -1 "router")"
-            ./setup/ovs-docker.sh add-port "${group_number}"-ssh ssh "${group_number}"_"${rname}"router --ipaddress="${subnet_router}"
+            extra=""
+            all_in_one="false"
+            if [[ ${#router_i[@]} -gt 4 ]]; then
+                if [[ "${router_i[4]}" == "ALL" ]]; then
+                    extra="${i}"
+                    all_in_one="true"
+                fi
+            fi
 
-            if [ "${rcmd}" == "vtysh" ]; then
-                docker cp "${DIRECTORY}"/groups/g"${group_number}"/id_rsa_command.pub "${group_number}"_"${rname}"router:/root/.ssh/authorized_keys > /dev/null
-            else
-                docker cp "${DIRECTORY}"/groups/g"${group_number}"/id_rsa.pub "${group_number}"_"${rname}"router:/root/.ssh/authorized_keys > /dev/null
+            if [[ "$all_in_one" == "false" || $i -eq 0 ]]; then
+                #ssh login for router"
+                subnet_router="$(subnet_sshContainer_groupContainer "${group_number}" "${i}" -1 "router")"
+                ./setup/ovs-docker.sh add-port "${group_number}"-ssh ssh "${group_number}"_"${rname}"router --ipaddress="${subnet_router}"
+
+                if [ "${rcmd}" == "vtysh" ]; then
+                    docker cp "${DIRECTORY}"/groups/g"${group_number}"/id_rsa_command.pub "${group_number}"_"${rname}"router:/root/.ssh/authorized_keys > /dev/null
+                else
+                    docker cp "${DIRECTORY}"/groups/g"${group_number}"/id_rsa.pub "${group_number}"_"${rname}"router:/root/.ssh/authorized_keys > /dev/null
+                fi
             fi
 
             if [[ ! -z "${dname}" ]];then
                 #ssh login for host
+                # TODO: check for bugs here!
                 subnet_host="$(subnet_sshContainer_groupContainer "${group_number}" "${i}" -1 "host")"
-                ./setup/ovs-docker.sh add-port "${group_number}"-ssh ssh "${group_number}"_"${rname}"host --ipaddress="${subnet_host}"
-                docker cp "${DIRECTORY}"/groups/g"${group_number}"/id_rsa.pub "${group_number}"_"${rname}"host:/root/.ssh/authorized_keys > /dev/null
-                docker exec "${group_number}"_"${rname}"host bash -c "kill -HUP \$(cat /var/run/sshd.pid)"
+                ./setup/ovs-docker.sh add-port "${group_number}"-ssh ssh "${group_number}"_"${rname}"host"${extra}" --ipaddress="${subnet_host}"
+                docker cp "${DIRECTORY}"/groups/g"${group_number}"/id_rsa.pub "${group_number}"_"${rname}"host"${extra}":/root/.ssh/authorized_keys > /dev/null
+                docker exec "${group_number}"_"${rname}"host"${extra}" bash -c "kill -HUP \$(cat /var/run/sshd.pid)"
             fi
 
             if [[ "${property2}" == *L2* ]]; then

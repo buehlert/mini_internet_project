@@ -216,6 +216,7 @@ subnet_ext_sshContainer () {
   fi
 }
 
+# TODO: check if we need to make changes for all-in-one stub solution!
 subnet_sshContainer_groupContainer () {
   local n_grp="$1" n_router="$2" n_layer2="$3" device="$4"
 

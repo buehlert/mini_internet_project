@@ -62,7 +62,19 @@ for ((k=0;k<group_numbers;k++));do
             fi
         done
 
+        all_in_one="false"
+        if [[ ${#router_i[@]} -gt 4 ]]; then
+            if [[ "${router_i[4]}" == "ALL" ]]; then
+                all_in_one="true"
+            fi
+        fi
+
+        # we only do it once if all-in-one setup
         for ((i=0;i<n_routers;i++)); do
+            if [[ "$all_in_one" == "true" && $i -gt 0 ]]; then
+                break
+            fi
+
             router_i=(${routers[$i]})
             rname="${router_i[0]}"
             property1="${router_i[1]}"
@@ -88,12 +100,24 @@ for ((k=0;k<group_numbers;k++));do
                 echo "ip address $(subnet_router ${group_number} ${i})"
                 echo "exit"
                 if [[ ! -z "${dname}" ]];then
-                    echo "interface host"
-                    echo "ip address $(subnet_host_router ${group_number} ${i} router)"
-                    echo "exit"
-                    echo "router ospf"
-                    echo "network $(subnet_host_router ${group_number} ${i} router) area 0"
-                    echo "exit"
+
+                    if [[ "$all_in_one" == "true" ]]; then
+                        for ((j=0;j<n_routers;j++)); do
+                            echo "interface host${j}"
+                            echo "ip address $(subnet_host_router ${group_number} ${j} router)"
+                            echo "exit"
+                            echo "router ospf"
+                            echo "network $(subnet_host_router ${group_number} ${j} router) area 0"
+                            echo "exit"
+                        done
+                    else
+                        echo "interface host"
+                        echo "ip address $(subnet_host_router ${group_number} ${i} router)"
+                        echo "exit"
+                        echo "router ospf"
+                        echo "network $(subnet_host_router ${group_number} ${i} router) area 0"
+                        echo "exit"
+                    fi
                 fi
 
                 if [[ "${property2}" == *L2* ]];then
@@ -115,6 +139,9 @@ for ((k=0;k<group_numbers;k++));do
                 echo "exit"
 
                 for ((j=0;j<n_routers;j++)); do
+                    if [[ "$all_in_one" == "true" && $i -gt 0 ]]; then
+                        break
+                    fi
                     router_j=(${routers[$j]})
                     rname2="${router_j[0]}"
                     if [ "${rname}" != "${rname2}" ]; then
